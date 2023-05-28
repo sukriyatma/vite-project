@@ -16,21 +16,35 @@ const DUMMY_TODO = [
 function App() {
   const [todos, setTodo] = useState(DUMMY_TODO);
   const [newTodo, setNewTodo] = useState('')
-  const [] = useState()
-
+  const [error, setError] = useState("")
 
   const addNewTodo = () => {
+    if (newTodo.length === 0) {
+      setError("Todo tidak boleh kosong")
+      return
+    }
+    
     const updatedTodo = [...todos]
     let objTodo = {
       id : nanoid(),
       title: newTodo,
-      isComplete : false
+      isCompleted : false
     }
     
     updatedTodo.push(objTodo);
     setTodo(updatedTodo)
     setNewTodo("")
   } 
+
+  const completeTodo = (targetTodo) => {
+    const updateTodo = todos.map( todo => {
+      if (todo.id != targetTodo) return todo
+        todo.isComplete = !todo.isComplete
+      return todo
+    })
+    setTodo(updateTodo)
+  } 
+
 
   return (
     <>
@@ -43,15 +57,27 @@ function App() {
       />
 
       <button onClick={addNewTodo}>Create</button>
+      {
+        error.length > 0 ? (
+          <p>{error}</p> 
+        ) : null
+      }
 
       <ul>
         {
           todos.map((todo) => (
-            <li key={todo.id} className='todo-item'>
-              <input type="checkbox"/> {todo.title}</li>
+            <li 
+              key={todo.id} 
+              className='todo-item' 
+              style={{textDecoration: (todo.isComplete?  "line-through" : "none") }}>
+              <input type="checkbox" onChange={() => {completeTodo(todo.id)}}/>
+              {todo.title}
+              <button style={{marginLeft: "16px"}}>X</button>
+            </li>
           ))
         }
       </ul>
+
     </>
   );
 }
